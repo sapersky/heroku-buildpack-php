@@ -4,11 +4,15 @@
 
 echo "Setting up SSH key for Composer..."
 mkdir -p $HOME/.ssh
-cp /home/dokku/.ssh/id_ed25519 $HOME/.ssh/id_ed25519
-cp /home/dokku/.ssh/id_ed25519.pub $HOME/.ssh/id_ed25519.pub
-chmod 600 $HOME/.ssh/id_ed25519
-chmod 644 $HOME/.ssh/id_ed25519.pub
-ssh-keyscan bitbucket.minebest.com >> $HOME/.ssh/known_hosts
+
+if [ -n "$SSH_PRIVATE_KEY_BASE64" ]; then
+  echo $SSH_PRIVATE_KEY_BASE64 | base64 --decode > $HOME/.ssh/id_ed25519
+  chmod 600 $HOME/.ssh/id_ed25519
+  ssh-keyscan bitbucket.minebest.com >> $HOME/.ssh/known_hosts
+else
+  echo "No SSH_PRIVATE_KEY_BASE64 environment variable set, skipping SSH key setup"
+fi
+
 
 # fail hard
 set -o pipefail
